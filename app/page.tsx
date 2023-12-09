@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect, use, ReactElement } from "react";
 import { Button } from "@nextui-org/button";
 import { title, subtitle } from "@/components/primitives";
 import { GithubIcon, SearchIcon } from "@/components/icons";
@@ -8,10 +8,11 @@ import { Spinner } from "@nextui-org/spinner";
 import ShopCard from "./card/shopcard";
 import { Input } from "@nextui-org/input";
 import { Select, SelectItem } from "@nextui-org/select";
-import { endpoint, generateImageUrl } from "@/config/API";
+import { endpoint, generateImageUrl, collection } from "@/config/API";
+import { createDirectus, rest, readItems } from "@directus/sdk";
 import {
   Dropdown,
-  DropdownItem,
+  DropdownItem as MyDropdownItem,
   DropdownTrigger,
   DropdownMenu,
 } from "@nextui-org/dropdown";
@@ -23,15 +24,30 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@nextui-org/modal";
-import { FoodPlaceItem, StateItem } from "@/config/model";
+import {
+  DiningCategory,
+  DiningCategoryItem,
+  FoodPlaceItem,
+  StateItem,
+} from "@/config/model";
 import { Selection as LibrarySelection } from "@react-types/shared/src/selection";
+import { log } from "console";
 
 type MySelectionType = Set<string>;
 
+const handleId = (selectedId: string) => {
+  console.log("Selected Id:", selectedId);
+  // Rest of your logic
+};
 export default function Home() {
-  const [selectedKeys, setSelectedKeys] = useState<MySelectionType>(new Set());
+  const [selectedKeys, setSelectedKeys] = useState<MySelectionType>(
+    new Set(["All"])
+  );
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [stateApi, setStateApi] = useState<StateItem[]>([]);
+  const [diningCatagory, setDiningCategory] = useState<DiningCategoryItem[]>(
+    []
+  );
   const [loading, setLoading] = useState(false);
   const [oriFoodPlace, setOriFoodPlace] = useState<FoodPlaceItem[]>([]);
   const [foodPlace, setFoodPlace] = useState<FoodPlaceItem[]>([]);
@@ -39,53 +55,110 @@ export default function Home() {
     () => Array.from(selectedKeys).join(", ").replaceAll("_", " "),
     [selectedKeys]
   );
+  const client = createDirectus(endpoint.url).with(rest());
+  const [noDataMessage, setNoDataMessage] = useState("");
   let arr = [1, 2, 3, 4, 5];
 
+  const renderDropdownItems = (stateApi: StateItem[]): ReactElement[] => {
+    const defaultItem = (
+      <MyDropdownItem value="All" key="All">
+        All
+      </MyDropdownItem>
+    );
+    const apiItems = stateApi.map((item, index) => (
+      <MyDropdownItem key={item.state}>{item.state}</MyDropdownItem>
+    ));
+    return [defaultItem, ...apiItems];
+  };
+
+  const filterFoodPlace = () => {
+    if (selectedValue !== "All") {
+      setNoDataMessage("No food places available.")
+      let newData = oriFoodPlace.filter(
+        (data) => data.states?.state === selectedValue
+      );
+      setFoodPlace(newData);
+    } else {
+      setFoodPlace([...oriFoodPlace]);
+    }
+  };
+
+  const fetcDiningCategory = async () => {
+    try {
+      const result = await client.request(
+        readItems(collection.diningCatagory, {
+          fields: ["category"],
+        })
+      );
+      // console.log(result, "cattt");
+      setDiningCategory(result as any as DiningCategoryItem[]);
+    } catch (error) {
+      setLoading(false);
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const fetchFoodPlace = async () => {
+    try {
+      setLoading(true);
+      const result = await client.request(
+        readItems(collection.foodPlace, {
+          fields: [
+            "name",
+            "image",
+            "category",
+            "intagram_reference",
+            "tiktok_reference",
+            "facebook_reference",
+            "website_link",
+            "city",
+            "state",
+            {
+              states: ["state"],
+              diningcategory: ["name"],
+            },
+          ],
+        })
+      );
+      // console.log(result, "FP");
+
+      setLoading(false);
+      setFoodPlace(result as any as FoodPlaceItem[]);
+      setOriFoodPlace(result as any as FoodPlaceItem[]);
+    } catch (error) {
+      setLoading(false);
+      console.error("Error fetching data:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        // Now imageUrl is available, and you can use it in your API call
-        const response = await fetch(endpoint.foodPlaceEndpoint);
-        const data = await response.json();
-        setOriFoodPlace(data.data);
-        setFoodPlace(data.data);
-        setLoading(false);
-        // data.data.map(item => {
+    filterFoodPlace();
+  }, [selectedKeys]);
 
-        // })
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    fetchData();
+  useEffect(() => {
+    fetchFoodPlace();
   }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
+    fetcDiningCategory();
+  }, []);
+
+  useEffect(() => {
+    const fetchState = async () => {
       try {
         const response = await fetch(endpoint.stateEndpoint);
         const data = await response.json();
-        setStateApi(data);
-        console.log(data);
+        setStateApi(data.data);
+        // console.log(data.data);
       } catch (err) {
         console.error(err);
       }
     };
 
-    fetchData();
+    fetchState();
   }, []);
   return (
     <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
-      {/* <div className="inline-block max-w-lg text-center justify-center">
-        <h1 className={title()}>
-          websites regardless of your design experience.
-        </h1>
-        <h2 className={subtitle({ class: "mt-4" })}>
-          Beautiful, fast and modern React UI library.
-        </h2>
-      </div> */}
       <div className="grid w-full gap-2">
         <Input
           aria-label="Search"
@@ -101,11 +174,10 @@ export default function Home() {
           type="search"
         />
 
-        
         <Dropdown>
           <DropdownTrigger>
             <Button variant="bordered" className="capitalize">
-              {selectedValue}
+              {selectedKeys}
             </Button>
           </DropdownTrigger>
           <DropdownMenu
@@ -115,15 +187,11 @@ export default function Home() {
             selectionMode="single"
             selectedKeys={selectedKeys}
             onSelectionChange={(keys: LibrarySelection) => {
-              // Handle the selection change if needed
               setSelectedKeys(keys as MySelectionType);
             }}
           >
-            {/* <DropdownItem key={"All"}>All</DropdownItem> */}
-            {stateApi.map((item, index) => 
-             <DropdownItem key={item.state}>{item.state}</DropdownItem>
-            )}
-            {/* Dropdown items */}
+          
+            {renderDropdownItems(stateApi)}
           </DropdownMenu>
         </Dropdown>
       </div>
@@ -131,17 +199,14 @@ export default function Home() {
         <div className="grid sm:grid-cols-1 lg:grid-cols-4 gap-4">
           {loading ? (
             <Spinner />
+          ) : foodPlace.length === 0 ? (
+            <p>{noDataMessage}</p>
           ) : (
             foodPlace.map((item) => (
               <div key={item.id}>
-                <ShopCard info={item} />
+                <ShopCard info={item} state="state" />
               </div>
             ))
-            //   arr.map((item) => (
-            //     <div>
-            //     <ShopCard />
-            //   </div>
-            // ))
           )}
         </div>
       </div>

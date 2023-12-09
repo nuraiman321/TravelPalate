@@ -1,10 +1,17 @@
 
-
 export const endpoint = {
+    url:"https://travelpalatenew-production.up.railway.app",
     foodPlaceEndpoint: "https://travelpalatenew-production.up.railway.app/items/foodPlace",
     imageEndpoint: "https://travelpalatenew-production.up.railway.app/assets",
-    stateEndpoint: "https://jian.sh/malaysia-api/state/v1/all.json"
+    stateEndpoint: "https://travelpalatenew-production.up.railway.app/items/state"
 };
+
+export const collection = {
+    foodPlace: "foodPlace",
+    state: "state",
+    travelPlace: "travelPlace",
+    diningCatagory: "diningCategory"
+}
 
 export const generateImageUrl = (id: string):string  => {
     if (typeof id === 'string' && id.length > 0) {
