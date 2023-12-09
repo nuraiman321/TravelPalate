@@ -47,7 +47,7 @@ const ShopCard = ({ info, state }: ShopCardProps) => {
         />
       </CardBody>
       <CardFooter className="pb-0 pt-2 px-4 flex-col items-start">
-        <p className="text-tiny uppercase font-bold">{info.category}</p>
+        <p className="text-tiny font-bold">{info.diningcategory?.category}</p>
         <small className="text-default-500">
           {info.city != null ? info.city + "," : ""}{" "}
           {/* {capitalizeFirstLetter(info.state) ?? ""} */}

@@ -40,29 +40,42 @@ const handleId = (selectedId: string) => {
   // Rest of your logic
 };
 export default function Home() {
-  const [selectedKeys, setSelectedKeys] = useState<MySelectionType>(
-    new Set(["All"])
-  );
+  const defaultState = "All State";
+  const defaultCategory = "All Category";
+  const [isFilterState, setIsFilterState] = useState(false);
+  const [isFilterCategory, setIsFilterCategory] = useState(false);
+  const [isDefaultState, setIsDefaultState] = useState(false);
+  const [isDefaultCategory, setIsDefaultCategory] = useState(false);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [stateApi, setStateApi] = useState<StateItem[]>([]);
-  const [diningCatagory, setDiningCategory] = useState<DiningCategoryItem[]>(
-    []
-  );
   const [loading, setLoading] = useState(false);
   const [oriFoodPlace, setOriFoodPlace] = useState<FoodPlaceItem[]>([]);
   const [foodPlace, setFoodPlace] = useState<FoodPlaceItem[]>([]);
-  const selectedValue = React.useMemo(
+  const client = createDirectus(endpoint.url).with(rest());
+  const [noDataMessage, setNoDataMessage] = useState("");
+  const [selectedKeys, setSelectedKeys] = useState<MySelectionType>(
+    new Set([defaultState])
+  );
+  const [selectedKeysCategory, setSelectedKeysCategory] =
+    useState<MySelectionType>(new Set([defaultCategory]));
+  const [diningCatagory, setDiningCategory] = useState<DiningCategoryItem[]>(
+    []
+  );
+  const selectedState = React.useMemo(
     () => Array.from(selectedKeys).join(", ").replaceAll("_", " "),
     [selectedKeys]
   );
-  const client = createDirectus(endpoint.url).with(rest());
-  const [noDataMessage, setNoDataMessage] = useState("");
+  const selectedCategory = React.useMemo(
+    () => Array.from(selectedKeysCategory).join(", ").replaceAll("_", " "),
+    [selectedKeysCategory]
+  );
+
   let arr = [1, 2, 3, 4, 5];
 
-  const renderDropdownItems = (stateApi: StateItem[]): ReactElement[] => {
+  const renderDropdownState = (stateApi: StateItem[]): ReactElement[] => {
     const defaultItem = (
-      <MyDropdownItem value="All" key="All">
-        All
+      <MyDropdownItem value={defaultState} key={defaultState}>
+        {defaultState}
       </MyDropdownItem>
     );
     const apiItems = stateApi.map((item, index) => (
@@ -71,19 +84,89 @@ export default function Home() {
     return [defaultItem, ...apiItems];
   };
 
-  const filterFoodPlace = () => {
-    if (selectedValue !== "All") {
-      setNoDataMessage("No food places available.")
-      let newData = oriFoodPlace.filter(
-        (data) => data.states?.state === selectedValue
-      );
-      setFoodPlace(newData);
+  const renderDropdownCategory = (
+    diningCategory: DiningCategoryItem[]
+  ): ReactElement[] => {
+    const defaultItem = (
+      <MyDropdownItem value={defaultCategory} key={defaultCategory}>
+        {defaultCategory}
+      </MyDropdownItem>
+    );
+    const categoryItems = diningCategory.map((item, index) => (
+      <MyDropdownItem key={item.category}>{item.category}</MyDropdownItem>
+    ));
+    return [defaultItem, ...categoryItems];
+  };
+
+  function filteringCategory(data: FoodPlaceItem[], selectedCat: string){
+      return data.filter((data) => data.diningcategory?.category === selectedCat)
+  }
+
+  function filteringState(data: FoodPlaceItem[], selectedSt: string){
+    return data.filter((data) => data.states?.state === selectedSt)
+  }
+
+  const filterFoodPlaceCat = () => {
+    if (selectedCategory !== defaultCategory) {
+      //category no equal to all
+      setIsDefaultCategory(false);
+      setIsFilterCategory(true);
+      // setNoDataMessage("No food places available in " + defaultCategory)
+      if (!isFilterState) {
+        //user not filtering state
+        let newData = filteringCategory(oriFoodPlace, selectedCategory)
+        setFoodPlace(newData);
+      } else {
+        //user filtering state
+        let newData = filteringCategory(filteringState(oriFoodPlace, selectedState), selectedCategory)
+        setFoodPlace(newData);
+      }
     } else {
-      setFoodPlace([...oriFoodPlace]);
+      setIsDefaultCategory(true);
+      setIsFilterCategory(false);
+      // category equal to all
+      if (!isFilterState) {
+        //not filtering state
+        setFoodPlace([...oriFoodPlace]);
+      } else {
+        //filtering state
+        let newData = filteringState(oriFoodPlace, selectedState)
+        setFoodPlace(newData);
+      }
+    }
+  };
+  const filterFoodPlace = () => {
+    if (selectedState !== defaultState) {
+      setIsDefaultState(false); // user choose state
+      setIsFilterState(true);
+      if (!isFilterCategory) {
+        //check if user is not filtering category
+        setNoDataMessage("No food places available in " + selectedState);
+        // let newData = oriFoodPlace.filter(
+        //   (data) => data.states?.state === selectedState
+        // );
+        let newData = filteringState(oriFoodPlace, selectedState)
+        setFoodPlace(newData);
+      } else {
+        //user filtering category
+        //
+        let newData = filteringState(filteringCategory(oriFoodPlace, selectedCategory), selectedState)
+        setFoodPlace(newData);
+      }
+    } else {
+      setIsDefaultState(true); // state equal to all
+      setIsFilterState(false);
+      if (!isFilterCategory) {
+        //check if user is filtering category
+        setFoodPlace([...oriFoodPlace]);
+      } else {
+        let newData = filteringCategory(oriFoodPlace, selectedCategory)
+        setFoodPlace(newData);
+      }
     }
   };
 
-  const fetcDiningCategory = async () => {
+  const fetchDiningCategory = async () => {
     try {
       const result = await client.request(
         readItems(collection.diningCatagory, {
@@ -103,6 +186,7 @@ export default function Home() {
       setLoading(true);
       const result = await client.request(
         readItems(collection.foodPlace, {
+          filter: { status: { _eq: "published" } },
           fields: [
             "name",
             "image",
@@ -115,7 +199,7 @@ export default function Home() {
             "state",
             {
               states: ["state"],
-              diningcategory: ["name"],
+              diningcategory: ["category"],
             },
           ],
         })
@@ -134,13 +218,16 @@ export default function Home() {
   useEffect(() => {
     filterFoodPlace();
   }, [selectedKeys]);
+  useEffect(() => {
+    filterFoodPlaceCat();
+  }, [selectedKeysCategory]);
 
   useEffect(() => {
     fetchFoodPlace();
   }, []);
 
   useEffect(() => {
-    fetcDiningCategory();
+    fetchDiningCategory();
   }, []);
 
   useEffect(() => {
@@ -160,7 +247,7 @@ export default function Home() {
   return (
     <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
       <div className="grid w-full gap-2">
-        <Input
+        {/* <Input
           aria-label="Search"
           classNames={{
             inputWrapper: "bg-default-100",
@@ -172,7 +259,7 @@ export default function Home() {
             <SearchIcon className="text-base text-default-400 pointer-events-none flex-shrink-0" />
           }
           type="search"
-        />
+        /> */}
 
         <Dropdown>
           <DropdownTrigger>
@@ -190,8 +277,26 @@ export default function Home() {
               setSelectedKeys(keys as MySelectionType);
             }}
           >
-          
-            {renderDropdownItems(stateApi)}
+            {renderDropdownState(stateApi)}
+          </DropdownMenu>
+        </Dropdown>
+        <Dropdown>
+          <DropdownTrigger>
+            <Button variant="bordered" className="capitalize">
+              {selectedKeysCategory}
+            </Button>
+          </DropdownTrigger>
+          <DropdownMenu
+            aria-label="Single selection example"
+            variant="flat"
+            disallowEmptySelection
+            selectionMode="single"
+            selectedKeys={selectedKeysCategory}
+            onSelectionChange={(keys: LibrarySelection) => {
+              setSelectedKeysCategory(keys as MySelectionType);
+            }}
+          >
+            {renderDropdownCategory(diningCatagory)}
           </DropdownMenu>
         </Dropdown>
       </div>

@@ -30,6 +30,6 @@ export interface FoodPlaceItem {
   }[];
 
   export interface DiningCategory{
-    name: string |null;
+    category: string |null;
     // state: string|null
   }[]
