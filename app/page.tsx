@@ -98,12 +98,12 @@ export default function Home() {
     return [defaultItem, ...categoryItems];
   };
 
-  function filteringCategory(data: FoodPlaceItem[], selectedCat: string){
-      return data.filter((data) => data.diningcategory?.category === selectedCat)
+  function filteringCategory(data: FoodPlaceItem[], selectedCat: string) {
+    return data.filter((data) => data.diningcategory?.category === selectedCat);
   }
 
-  function filteringState(data: FoodPlaceItem[], selectedSt: string){
-    return data.filter((data) => data.states?.state === selectedSt)
+  function filteringState(data: FoodPlaceItem[], selectedSt: string) {
+    return data.filter((data) => data.states?.state === selectedSt);
   }
 
   const filterFoodPlaceCat = () => {
@@ -114,11 +114,14 @@ export default function Home() {
       // setNoDataMessage("No food places available in " + defaultCategory)
       if (!isFilterState) {
         //user not filtering state
-        let newData = filteringCategory(oriFoodPlace, selectedCategory)
+        let newData = filteringCategory(oriFoodPlace, selectedCategory);
         setFoodPlace(newData);
       } else {
         //user filtering state
-        let newData = filteringCategory(filteringState(oriFoodPlace, selectedState), selectedCategory)
+        let newData = filteringCategory(
+          filteringState(oriFoodPlace, selectedState),
+          selectedCategory
+        );
         setFoodPlace(newData);
       }
     } else {
@@ -130,7 +133,7 @@ export default function Home() {
         setFoodPlace([...oriFoodPlace]);
       } else {
         //filtering state
-        let newData = filteringState(oriFoodPlace, selectedState)
+        let newData = filteringState(oriFoodPlace, selectedState);
         setFoodPlace(newData);
       }
     }
@@ -145,12 +148,15 @@ export default function Home() {
         // let newData = oriFoodPlace.filter(
         //   (data) => data.states?.state === selectedState
         // );
-        let newData = filteringState(oriFoodPlace, selectedState)
+        let newData = filteringState(oriFoodPlace, selectedState);
         setFoodPlace(newData);
       } else {
         //user filtering category
         //
-        let newData = filteringState(filteringCategory(oriFoodPlace, selectedCategory), selectedState)
+        let newData = filteringState(
+          filteringCategory(oriFoodPlace, selectedCategory),
+          selectedState
+        );
         setFoodPlace(newData);
       }
     } else {
@@ -160,7 +166,7 @@ export default function Home() {
         //check if user is filtering category
         setFoodPlace([...oriFoodPlace]);
       } else {
-        let newData = filteringCategory(oriFoodPlace, selectedCategory)
+        let newData = filteringCategory(oriFoodPlace, selectedCategory);
         setFoodPlace(newData);
       }
     }
@@ -175,6 +181,20 @@ export default function Home() {
       );
       // console.log(result, "cattt");
       setDiningCategory(result as any as DiningCategoryItem[]);
+    } catch (error) {
+      setLoading(false);
+      console.error("Error fetching data:", error);
+    }
+  };
+  const fetchState = async () => {
+    try {
+      const result = await client.request(
+        readItems(collection.state, {
+          fields: ["state"],
+        })
+      );
+      // console.log(result, "cattt");
+      setStateApi(result as any as StateItem[]);
     } catch (error) {
       setLoading(false);
       console.error("Error fetching data:", error);
@@ -196,6 +216,7 @@ export default function Home() {
             "facebook_reference",
             "website_link",
             "city",
+            "locationLink",
             "state",
             {
               states: ["state"],
@@ -204,7 +225,7 @@ export default function Home() {
           ],
         })
       );
-      // console.log(result, "FP");
+      console.log(result, "FP");
 
       setLoading(false);
       setFoodPlace(result as any as FoodPlaceItem[]);
@@ -231,17 +252,6 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const fetchState = async () => {
-      try {
-        const response = await fetch(endpoint.stateEndpoint);
-        const data = await response.json();
-        setStateApi(data.data);
-        // console.log(data.data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
     fetchState();
   }, []);
   return (

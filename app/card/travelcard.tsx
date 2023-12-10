@@ -3,7 +3,7 @@ import { Card, CardHeader, CardBody, CardFooter } from "@nextui-org/card";
 import { Image } from "@nextui-org/image";
 import { Button } from "@nextui-org/button";
 import { FaTiktok, FaInstagram, FaShopware } from "react-icons/fa";
-import { FaShop, FaLocationDot } from "react-icons/fa6";
+import { FaShop } from "react-icons/fa6";
 import { FoodPlaceItem, StateItem } from "@/config/model";
 import { generateImageUrl } from "@/config/API";
 
@@ -31,7 +31,7 @@ const handleButtonRefenrece = (link: string | null) => {
   }
 };
 
-const ShopCard = ({ info, state }: ShopCardProps) => {
+const TravelCard = ({ info, state }: ShopCardProps) => {
   const [stateDisplay, setStateDisplay] = useState("")
   // let filterState = state.filter(data => data.id == info?.state4)
   // setStateDisplay(filterState[0]?.state);
@@ -94,19 +94,6 @@ const ShopCard = ({ info, state }: ShopCardProps) => {
               onClick={() => handleButtonRefenrece(info.instagram_reference)}
             >
               <FaInstagram />
-            </Button>
-          ) : (
-            ""
-          )}
-          {info.locationLink != null ? (
-            <Button
-              size="md"
-              isIconOnly
-              variant="faded"
-              aria-label="Take a photo"
-              onClick={() => handleButtonRefenrece(info.locationLink)}
-            >
-              <FaLocationDot />
             </Button>
           ) : (
             ""

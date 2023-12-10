@@ -16,7 +16,7 @@ export const siteConfig = {
 			href: "/",
 		},
 		{
-			label: "Travel",
+			label: "travel",
 			href: "/travel",
 		},
 		

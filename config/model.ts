@@ -14,6 +14,22 @@ export interface FoodPlaceItem {
     states: States | null;
     diningcategory: DiningCategory | null;
     state4: number | null
+    locationLink: string | null
+  };
+export interface TravelPlaceItem {
+    city: string;
+    facebook_reference: string | null;
+    id: string;
+    image: string;
+    instagram_reference: string | null;
+    name: string;
+    state: string;
+    status: string;
+    tiktok_reference: string | null;
+    website_link : string | null;
+    states: States | null;
+    diningcategory: DiningCategory | null;
+    locationLink: string | null
   };
 
   export interface StateItem{
