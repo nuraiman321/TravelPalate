@@ -10,7 +10,9 @@ export const collection = {
     foodPlace: "foodPlace",
     state: "state",
     travelPlace: "travelPlace",
-    diningCatagory: "diningCategory"
+    diningCatagory: "diningCategory",
+    accommodationType: "accommodation_type",
+    natureDestination: "nature_destination"
 }
 
 export const generateImageUrl = (id: string):string  => {

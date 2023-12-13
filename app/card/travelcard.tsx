@@ -4,11 +4,11 @@ import { Image } from "@nextui-org/image";
 import { Button } from "@nextui-org/button";
 import { FaTiktok, FaInstagram, FaShopware } from "react-icons/fa";
 import { FaShop } from "react-icons/fa6";
-import { FoodPlaceItem, StateItem } from "@/config/model";
+import { TravelPlaceItem } from "@/config/model";
 import { generateImageUrl } from "@/config/API";
 
-interface ShopCardProps {
-  info: FoodPlaceItem;
+interface TravelCardProps {
+  info: TravelPlaceItem;
   state: string;
 }
 
@@ -31,7 +31,7 @@ const handleButtonRefenrece = (link: string | null) => {
   }
 };
 
-const TravelCard = ({ info, state }: ShopCardProps) => {
+const TravelCard = ({ info, state }: TravelCardProps) => {
   const [stateDisplay, setStateDisplay] = useState("")
   // let filterState = state.filter(data => data.id == info?.state4)
   // setStateDisplay(filterState[0]?.state);
@@ -47,9 +47,9 @@ const TravelCard = ({ info, state }: ShopCardProps) => {
         />
       </CardBody>
       <CardFooter className="pb-0 pt-2 px-4 flex-col items-start">
-        <p className="text-tiny font-bold">{info.diningcategory?.category}</p>
+        <p className="text-tiny font-bold">{info.accommodationType?.accommodationName}</p>
         <small className="text-default-500">
-          {info.city != null ? info.city + "," : ""}{" "}
+          {info.City != null ? info.City + "," : ""}{" "}
           {/* {capitalizeFirstLetter(info.state) ?? ""} */}
           {info.states?.state}
         </small>
@@ -103,4 +103,4 @@ const TravelCard = ({ info, state }: ShopCardProps) => {
     </Card>
   );
 };
-export default ShopCard;
+export default TravelCard;
