@@ -12,11 +12,11 @@ export const siteConfig = {
 	],
 	navMenuItems: [
 		{
-			label: "Home",
+			label: "Food Place",
 			href: "/",
 		},
 		{
-			label: "travel",
+			label: "Travel Place",
 			href: "/travel",
 		},
 		

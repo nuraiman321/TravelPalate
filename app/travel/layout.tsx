@@ -142,7 +142,6 @@ export default function TravelLayout() {
       if (!isFilterState) {
         //user not filtering state
         let newData = filteringAccommodation(oriTravelPlace, selectedAccommodation);
-        console.log(oriTravelPlace);
         setTravelPlace(newData);
       } else {
         //user filtering state
@@ -234,7 +233,6 @@ export default function TravelLayout() {
           fields: ["accommodationName"],
         })
       );
-      // console.log(result, "accom");
       setAccommodation(result as any as AccommodationType[]);
     } catch (error) {
       setLoading(false);
@@ -248,7 +246,6 @@ export default function TravelLayout() {
           fields: ["natureName"],
         })
       );
-      // console.log(result, "Nature");
       setNatureDestination(result as any as NatureDestination[]);
     } catch (error) {
       setLoading(false);
@@ -262,7 +259,6 @@ export default function TravelLayout() {
           fields: ["state"],
         })
       );
-      // console.log(result, "cattt");
       setStateApi(result as any as StateItem[]);
     } catch (error) {
       setLoading(false);
@@ -295,7 +291,6 @@ export default function TravelLayout() {
           ],
         })
       );
-      console.log(result, "TP");
 
       setLoading(false);
       setTravelPlace(result as any as TravelPlaceItem[]);

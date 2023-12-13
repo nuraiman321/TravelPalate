@@ -1,3 +1,4 @@
+"use client";
 import {
 	Navbar as NextUINavbar,
 	NavbarContent,
@@ -11,7 +12,7 @@ import { Button } from "@nextui-org/button";
 import { Kbd } from "@nextui-org/kbd";
 import { Link } from "@nextui-org/link";
 import { Input } from "@nextui-org/input";
-
+import { usePathname } from "next/navigation";
 import { link as linkStyles } from "@nextui-org/theme";
 
 import { siteConfig } from "@/config/site";
@@ -30,6 +31,7 @@ import {
 import { Logo } from "@/components/icons";
 
 export const Navbar = () => {
+	const pathname = usePathname()
 	const searchInput = (
 		<Input
 			aria-label="Search"
@@ -123,13 +125,9 @@ export const Navbar = () => {
 					{siteConfig.navMenuItems.map((item, index) => (
 						<NavbarMenuItem key={`${item}-${index}`}>
 							<Link
-								// color={
-								// 	index === 2
-								// 		? "primary"
-								// 		: index === siteConfig.navMenuItems.length - 1
-								// 		? "danger"
-								// 		: "foreground"
-								// }
+								color={
+									pathname === item.href ? "primary": "foreground"
+								}
 								href={item.href}
 								size="lg"
 							>
