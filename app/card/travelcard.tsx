@@ -44,6 +44,7 @@ const TravelCard = ({ info, state }: TravelCardProps) => {
           alt="Card background"
           className="object-cover rounded-xl "
           src={generateImageUrl(info.image)}
+          style={{width: '100%'}}
         />
       </CardBody>
       <CardFooter className="pb-0 pt-2 px-4 flex-col items-start">

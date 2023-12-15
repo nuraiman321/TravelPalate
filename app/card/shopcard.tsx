@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Card, CardHeader, CardBody, CardFooter } from "@nextui-org/card";
 import { Image } from "@nextui-org/image";
 import { Button } from "@nextui-org/button";
@@ -32,7 +32,7 @@ const handleButtonRefenrece = (link: string | null) => {
 };
 
 const ShopCard = ({ info, state }: ShopCardProps) => {
-  const [stateDisplay, setStateDisplay] = useState("")
+  const [stateDisplay, setStateDisplay] = useState("");
   // let filterState = state.filter(data => data.id == info?.state4)
   // setStateDisplay(filterState[0]?.state);
   // setStateDisplay(stt);
@@ -41,9 +41,12 @@ const ShopCard = ({ info, state }: ShopCardProps) => {
     <Card className="py-4">
       <CardBody className="overflow-visible py-2">
         <Image
+          isZoomed
           alt="Card background"
           className="object-cover rounded-xl "
           src={generateImageUrl(info.image)}
+          width={600}
+          style={{width: '100%'}}
         />
       </CardBody>
       <CardFooter className="pb-0 pt-2 px-4 flex-col items-start">
@@ -54,7 +57,7 @@ const ShopCard = ({ info, state }: ShopCardProps) => {
           {info.states?.state}
         </small>
         <h4 className="font-bold text-large">
-          {capitalizeFirstLetter(info.name) ?? ""} 
+          {capitalizeFirstLetter(info.name) ?? ""}
           {/* {stateDisplay} */}
         </h4>
         <div className="flex gap-1 items-end">
