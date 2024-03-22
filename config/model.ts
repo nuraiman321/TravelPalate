@@ -65,3 +65,10 @@ export interface NatureDestination {
   natureName: string;
 }
 [];
+
+export interface StuffCardInterface {
+  id: number;
+  prodcutTitle: string;
+  imageId: string;
+  price: string;
+};

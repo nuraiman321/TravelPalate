@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardBody, CardFooter } from "@nextui-org/card";
 import { Image } from "@nextui-org/image";
 import { Button } from "@nextui-org/button";
 import { FaTiktok, FaInstagram, FaShopware } from "react-icons/fa";
 import { FaShop } from "react-icons/fa6";
 import { TravelPlaceItem } from "@/config/model";
-import { generateImageUrl } from "@/config/API";
+import { generateImageUrl, generateTiktokThumbnail } from "@/config/API";
 
 interface TravelCardProps {
   info: TravelPlaceItem;
@@ -32,30 +32,67 @@ const handleButtonRefenrece = (link: string | null) => {
 };
 
 const TravelCard = ({ info, state }: TravelCardProps) => {
-  const [stateDisplay, setStateDisplay] = useState("")
+  const [stateDisplay, setStateDisplay] = useState("");
+  const [thumbnail, setThumbnail] = useState<String | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
   // let filterState = state.filter(data => data.id == info?.state4)
   // setStateDisplay(filterState[0]?.state);
   // setStateDisplay(stt);
   // console.log(filterState, "res")
+
+  const fetchData = async () => {
+    // try {
+    //   const response = await fetch(`https://www.tiktok.com/oembed?url=${info.tiktok_reference}`);
+    //   if (!response.ok) {
+    //     throw new Error('Network response was not ok');
+    //   }
+    //   const jsonData = await response.json();
+    //   // console.log(jsonData, "RESULT");
+    //   setThumbnail(jsonData?.thumbnail_url);
+    // } catch (error) {
+    //   console.error('Error fetching data:', error);
+    // } finally {
+    //   setLoading(false);
+    // }
+
+    try {
+      const ttUrl = "..."; // Provide the TikTok URL here
+      const thumb = await generateTiktokThumbnail(info.tiktok_reference);
+      console.log("Thumbnail URL:", thumb);
+      setThumbnail(thumb);
+      // Do something with the thumbnail URL
+    } catch (error) {
+      console.error("Failed to generate TikTok thumbnail:", error);
+      // Handle errors
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [info]);
   return (
     <Card className="py-4">
       <CardBody className="overflow-visible py-2">
         <Image
           alt="Card background"
           className="object-cover rounded-xl "
-          src={generateImageUrl(info.image)}
-          style={{width: '100%'}}
+          // src={generateImageUrl(info.image)}
+          src={thumbnail != null ? thumbnail : generateImageUrl(info.image)}
+          style={{ width: "100%" }}
         />
       </CardBody>
       <CardFooter className="pb-0 pt-2 px-4 flex-col items-start">
-        <p className="text-tiny font-bold">{info.accommodationType?.accommodationName}</p>
+        <p className="text-tiny font-bold">
+          {info.accommodationType?.accommodationName}
+        </p>
         <small className="text-default-500">
           {info.City != null ? info.City + "," : ""}{" "}
           {/* {capitalizeFirstLetter(info.state) ?? ""} */}
           {info.states?.state}
         </small>
         <h4 className="font-bold text-large">
-          {capitalizeFirstLetter(info.name) ?? ""} 
+          {capitalizeFirstLetter(info.name) ?? ""}
           {/* {stateDisplay} */}
         </h4>
         <div className="flex gap-1 items-end">

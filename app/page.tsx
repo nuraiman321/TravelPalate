@@ -225,7 +225,7 @@ export default function Home() {
           ],
         })
       );
-      console.log(result, "FP");
+      // console.log(result, "FP");
 
       setLoading(false);
       setFoodPlace(result as any as FoodPlaceItem[]);
