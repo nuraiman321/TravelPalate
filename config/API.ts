@@ -30,7 +30,7 @@ interface Data{
     title: string;
     thumbnail_url: string;
 }
-export const generateTiktokThumbnail = async (ttUrl: string ):Promise<string> => {
+export const generateTiktokThumbnail = async (ttUrl: string | null ):Promise<string | null> => {
     try {
       const response = await fetch(`${endpoint.tikTokEndpoint}${ttUrl}`);
       if (!response.ok) {

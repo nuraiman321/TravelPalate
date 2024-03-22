@@ -5,7 +5,7 @@ import { Button } from "@nextui-org/button";
 import { FaTiktok, FaInstagram, FaShopware } from "react-icons/fa";
 import { FaShop, FaLocationDot } from "react-icons/fa6";
 import { FoodPlaceItem, StateItem } from "@/config/model";
-import { generateImageUrl } from "@/config/API";
+import { generateImageUrl, generateTiktokThumbnail } from "@/config/API";
 
 interface ShopCardProps {
   info: FoodPlaceItem;
@@ -46,24 +46,21 @@ const ShopCard = ({ info, state }: ShopCardProps) => {
   // setStateDisplay(filterState[0]?.state);
   // setStateDisplay(stt);
   // console.log(filterState, "res")
-  const fetchData = async (setThumbnail, setLoading) => {
+  const fetchData = async () => {
     try {
-      const response = await fetch(`https://www.tiktok.com/oembed?url=${info.tiktok_reference}`);
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const jsonData = await response.json();
-      // console.log(jsonData, "RESULT");
-      setThumbnail(jsonData?.thumbnail_url);
+      const ttUrl = "..."; // Provide the TikTok URL here
+      const thumb:string | null = await generateTiktokThumbnail(info.tiktok_reference);
+      console.log("Thumbnail URL:", thumb);
+      setThumbnail(thumb);
+      // Do something with the thumbnail URL
     } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false);
+      console.error("Failed to generate TikTok thumbnail:", error);
+      // Handle errors
     }
   };
 
   useEffect(() => {
-    fetchData(setThumbnail, setLoading);
+    fetchData();
   }, [info]);
   return (
     <Card className="py-4 ">

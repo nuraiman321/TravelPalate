@@ -58,7 +58,7 @@ const TravelCard = ({ info, state }: TravelCardProps) => {
 
     try {
       const ttUrl = "..."; // Provide the TikTok URL here
-      const thumb = await generateTiktokThumbnail(info.tiktok_reference);
+      const thumb:string | null = await generateTiktokThumbnail(info.tiktok_reference);
       console.log("Thumbnail URL:", thumb);
       setThumbnail(thumb);
       // Do something with the thumbnail URL
