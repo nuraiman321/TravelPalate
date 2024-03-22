@@ -78,7 +78,7 @@ const TravelCard = ({ info, state }: TravelCardProps) => {
           alt="Card background"
           className="object-cover rounded-xl "
           // src={generateImageUrl(info.image)}
-          src={thumbnail != null ? thumbnail : generateImageUrl(info.image)}
+          src={`${thumbnail != null ? thumbnail : generateImageUrl(info.image)}`}
           style={{ width: "100%" }}
         />
       </CardBody>

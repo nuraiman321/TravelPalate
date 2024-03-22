@@ -70,7 +70,7 @@ const ShopCard = ({ info, state }: ShopCardProps) => {
           alt="Card background"
           className="object-fill rounded-xl img-height "
           // src={generateImageUrl(info.image)}
-          src={thumbnail != null ? thumbnail : generateImageUrl(info.image) }
+          src={`${thumbnail != null ? thumbnail : generateImageUrl(info.image) }`}
           // style={{ height: 300}}
           
         />
