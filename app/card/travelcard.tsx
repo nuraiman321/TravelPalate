@@ -4,8 +4,9 @@ import { Image } from "@nextui-org/image";
 import { Button } from "@nextui-org/button";
 import { FaTiktok, FaInstagram, FaShopware } from "react-icons/fa";
 import { FaShop } from "react-icons/fa6";
-import { TravelPlaceItem } from "@/config/model";
+import { TiktokData, TravelPlaceItem } from "@/config/model";
 import { generateImageUrl, generateTiktokThumbnail } from "@/config/API";
+import Tooltips from "@/components/tooltip";
 
 interface TravelCardProps {
   info: TravelPlaceItem;
@@ -33,7 +34,8 @@ const handleButtonRefenrece = (link: string | null) => {
 
 const TravelCard = ({ info, state }: TravelCardProps) => {
   const [stateDisplay, setStateDisplay] = useState("");
-  const [thumbnail, setThumbnail] = useState<String | null>(null);
+  const [thumbnail, setThumbnail] = useState<String | null| undefined>(null);
+  const [title, setTitle] = useState<String | undefined | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   // let filterState = state.filter(data => data.id == info?.state4)
@@ -58,9 +60,10 @@ const TravelCard = ({ info, state }: TravelCardProps) => {
 
     try {
       const ttUrl = "..."; // Provide the TikTok URL here
-      const thumb:string | null = await generateTiktokThumbnail(info.tiktok_reference);
-      console.log("Thumbnail URL:", thumb);
-      setThumbnail(thumb);
+      const tiktokData:TiktokData | null = await generateTiktokThumbnail(info.tiktok_reference);
+      console.log("Tiktok:", tiktokData );
+      setThumbnail(tiktokData?.thumbnail_url);
+      setTitle(tiktokData?.title);
       // Do something with the thumbnail URL
     } catch (error) {
       console.error("Failed to generate TikTok thumbnail:", error);
@@ -91,10 +94,13 @@ const TravelCard = ({ info, state }: TravelCardProps) => {
           {/* {capitalizeFirstLetter(info.state) ?? ""} */}
           {info.states?.state}
         </small>
-        <h4 className="font-bold text-large">
-          {capitalizeFirstLetter(info.name) ?? ""}
-          {/* {stateDisplay} */}
-        </h4>
+        <div className="w-full flex  justify-between">
+          <h4 className="font-bold text-large">
+            {capitalizeFirstLetter(info.name) ?? ""}
+            {/* {stateDisplay} */}
+          </h4>
+          {title != null ? <Tooltips info={title} /> : ""}
+        </div>
         <div className="flex gap-1 items-end">
           {info.website_link != null ? (
             <Button

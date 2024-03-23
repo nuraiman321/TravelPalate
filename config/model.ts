@@ -72,3 +72,10 @@ export interface StuffCardInterface {
   imageId: string;
   price: string;
 };
+
+export interface TiktokData{
+  version: string;
+  type: string;
+  title: string;
+  thumbnail_url: string;
+}

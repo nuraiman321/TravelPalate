@@ -1,11 +1,12 @@
-import React, { useState , useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardHeader, CardBody, CardFooter } from "@nextui-org/card";
 import { Image } from "@nextui-org/image";
 import { Button } from "@nextui-org/button";
 import { FaTiktok, FaInstagram, FaShopware } from "react-icons/fa";
 import { FaShop, FaLocationDot } from "react-icons/fa6";
-import { FoodPlaceItem, StateItem } from "@/config/model";
+import { FoodPlaceItem, StateItem, TiktokData } from "@/config/model";
 import { generateImageUrl, generateTiktokThumbnail } from "@/config/API";
+import Tooltips from "@/components/tooltip";
 
 interface ShopCardProps {
   info: FoodPlaceItem;
@@ -16,9 +17,6 @@ interface Data {
   html: string;
 }
 
-
-
-
 function capitalizeFirstLetter(sentence: string): string {
   if (sentence === null || sentence === "" || sentence === undefined) {
     return sentence;
@@ -26,7 +24,7 @@ function capitalizeFirstLetter(sentence: string): string {
   const words = sentence.split(" ");
   const capitalizedWords = words.map(
     (word) => word.charAt(0).toUpperCase() + word.slice(1)
-    );
+  );
   return capitalizedWords.join(" ");
 }
 
@@ -40,7 +38,8 @@ const handleButtonRefenrece = (link: string | null) => {
 
 const ShopCard = ({ info, state }: ShopCardProps) => {
   const [stateDisplay, setStateDisplay] = useState("");
-  const [thumbnail, setThumbnail] = useState<String | null>(null);
+  const [thumbnail, setThumbnail] = useState<String | undefined | null>(null);
+  const [title, setTitle] = useState<String | undefined | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   // let filterState = state.filter(data => data.id == info?.state4)
   // setStateDisplay(filterState[0]?.state);
@@ -48,10 +47,12 @@ const ShopCard = ({ info, state }: ShopCardProps) => {
   // console.log(filterState, "res")
   const fetchData = async () => {
     try {
-      const ttUrl = "..."; // Provide the TikTok URL here
-      const thumb:string | null = await generateTiktokThumbnail(info.tiktok_reference);
-      console.log("Thumbnail URL:", thumb);
-      setThumbnail(thumb);
+      const tiktokData: TiktokData | null = await generateTiktokThumbnail(
+        info.tiktok_reference
+      );
+      console.log("TIKTOK", tiktokData?.title);
+      setThumbnail(tiktokData?.thumbnail_url);
+      setTitle(tiktokData?.title);
       // Do something with the thumbnail URL
     } catch (error) {
       console.error("Failed to generate TikTok thumbnail:", error);
@@ -70,10 +71,12 @@ const ShopCard = ({ info, state }: ShopCardProps) => {
           alt="Card background"
           className="object-fill rounded-xl img-height "
           // src={generateImageUrl(info.image)}
-          src={`${thumbnail != null ? thumbnail : generateImageUrl(info.image) }`}
+          src={`${
+            thumbnail != null ? thumbnail : generateImageUrl(info.image)
+          }`}
           // style={{ height: 300}}
-          
         />
+        <div className="relative "></div>
       </CardBody>
       <CardFooter className="pb-0 pt-2 px-4 flex-col items-start">
         <p className="text-tiny font-bold">{info.diningcategory?.category}</p>
@@ -82,10 +85,13 @@ const ShopCard = ({ info, state }: ShopCardProps) => {
           {/* {capitalizeFirstLetter(info.state) ?? ""} */}
           {info.states?.state}
         </small>
-        <h4 className="font-bold text-large">
-          {capitalizeFirstLetter(info.name) ?? ""}
-          {/* {stateDisplay} */}
-        </h4>
+        <div className="w-full flex  justify-between">
+          <h4 className="font-bold text-large">
+            {capitalizeFirstLetter(info.name) ?? ""}
+            {/* {stateDisplay} */}
+          </h4>
+          {title != null ? <Tooltips info={title} /> : ""}
+        </div>
         <div className="flex gap-1 items-end">
           {info.website_link != null ? (
             <Button

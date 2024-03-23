@@ -6,3 +6,10 @@
     /* height: 1600px; */
     max-width: 100%;
 }
+
+.floating-btn{
+    z-index: 10;
+    left: 90%;
+    /* top: -20px; */
+    bottom: 19%;
+}
