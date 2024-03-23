@@ -50,7 +50,7 @@ const ShopCard = ({ info, state }: ShopCardProps) => {
       const tiktokData: TiktokData | null = await generateTiktokThumbnail(
         info.tiktok_reference
       );
-      console.log("TIKTOK", tiktokData?.title);
+      // console.log("TIKTOK", tiktokData?.title);
       setThumbnail(tiktokData?.thumbnail_url);
       setTitle(tiktokData?.title);
       // Do something with the thumbnail URL
