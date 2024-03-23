@@ -255,7 +255,7 @@ export default function Home() {
     fetchState();
   }, []);
   return (
-    <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
+    <section className="flex flex-col items-center justify-center gap-4  md:py-10">
       <div className="grid w-full gap-2">
         {/* <Input
           aria-label="Search"
